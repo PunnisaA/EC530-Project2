@@ -1,6 +1,11 @@
 import asyncio
 import redis.asyncio as redis
 import json
+import ImageService
+import EmbeddingService
+import VectorIndexService
+import DocumentDBService
+import upload
 
 async def check_availability():
     r = redis.Redis(host='localhost', decode_responses=True)
@@ -8,11 +13,11 @@ async def check_availability():
     await pubsub.subscribe("service_status")
     await asyncio.sleep(0.5) 
     
-    print("Central Publisher: Checking who is online...")
-    await r.publish("broadcast", "REPORT_STATUS")
+    print("Publisher: Checking online services...")
+    await r.publish("broadcast", "STATUS")
     print("Waiting for services to check in...")
     try:
-        async with asyncio.timeout(10): 
+        # async with asyncio.timeout(10): # 10 seconds before timeout
             async for message in pubsub.listen():
                 if message["type"] == "message":
                     try:
@@ -27,8 +32,14 @@ async def check_availability():
         await pubsub.unsubscribe("service_status")
         await r.aclose()
 
+async def main():
+    await asyncio.gather(ImageService.main(), EmbeddingService.main(), 
+                         DocumentDBService.main(), VectorIndexService.main(), 
+                         upload.main(), check_availability())
+
 if __name__ == "__main__":
     try:
-        asyncio.run(check_availability())
+        asyncio.run(main())
+        # asyncio.run(check_availability())
     except KeyboardInterrupt:
         pass
