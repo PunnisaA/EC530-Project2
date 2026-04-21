@@ -10,6 +10,17 @@ class BasePayload:
     event_id: str = field(default_factory=lambda: str(uuid.uuid4()))      # unique ID for the specific event to auto-generate
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat()) # help of AI to generate this
 
+    # asked AI to help create a way to change from object to JSON and vice versa (will be inherited by the other objects)
+    def to_json(self) -> str:
+        """Converts the object to a JSON string for Redis publishing."""
+        return json.dumps(asdict(self))
+    
+    @classmethod
+    def from_json(cls, json_str: str):
+        """Creates an object from a JSON string received from Redis."""
+        data = json.loads(json_str)
+        return cls(**data)
+
 # Image Upload [CLI -> Image Service]
 @dataclass
 class ImageProcPayload(BasePayload):
