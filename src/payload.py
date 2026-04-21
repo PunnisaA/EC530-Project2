@@ -1,4 +1,4 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 import uuid
 from datetime import datetime, timezone
 import json
@@ -6,20 +6,30 @@ import json
 # every other class will have the base payload and have unique event IDs
 @dataclass
 class BasePayload:
-    image_id: str      # ID of the image for both databases
-    event_id: str      # unique ID for the specific event
-    timestamp: str = datetime.now(timezone.utc).isoformat()
+    image_id: str      # ID of the image for both databases (must be provided from the CLI interface)
+    event_id: str = field(default_factory=lambda: str(uuid.uuid4()))      # unique ID for the specific event to auto-generate
+    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat()) # help of AI to generate this
 
-# IMAGE UPLOAD & PROCESSING 
+# Image Upload [CLI -> Image Service]
 @dataclass
 class ImageProcPayload(BasePayload):
     path: str
     file_type: str
 
-# Image Service
+# Embedding Service has two AIs, one to do the embedding from the image to vector space and the other is to detect 
+# what the user is looking for and obtaining the embedding for that
+# User's Query [CLI -> Embedding]
+@dataclass
+class QueryRequestPayload(BasePayload):
+    """CLI -> Embedding Service (Request Pathway)"""
+    query_text: str
+    user_id: str          # ID for user to return it to the right user
+    top_k: int = 5        # How many images to return
+
+# Image Service [Image Service -> Embedding]
 @dataclass
 class ImageAnnotatedPayload(BasePayload):
-    vertices: list[dict] 
+    vertices: list[dict]
     labels: list[str]
 
 # Vector Index (Targeting Vector DB) [Embedding -> Vector Index]
