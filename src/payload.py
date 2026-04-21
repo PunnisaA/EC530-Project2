@@ -4,9 +4,9 @@ from datetime import datetime, timezone
 import json
 
 # every other class will have the base payload and have unique event IDs
-@dataclass
+@dataclass(kw_only=True)
 class BasePayload:
-    image_id: str      # ID of the image for both databases (must be provided from the CLI interface)
+    image_id: None     # ID of the image for both databases (must be provided from the CLI interface)
     event_id: str = field(default_factory=lambda: str(uuid.uuid4()))      # unique ID for the specific event to auto-generate
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat()) # help of AI to generate this
 
@@ -22,7 +22,7 @@ class BasePayload:
         return cls(**data)
 
 # Image Upload [CLI -> Image Service]
-@dataclass
+@dataclass(kw_only=True)
 class ImageProcPayload(BasePayload):
     path: str
     file_type: str
@@ -30,7 +30,7 @@ class ImageProcPayload(BasePayload):
 # Embedding Service has two AIs, one to do the embedding from the image to vector space and the other is to detect 
 # what the user is looking for and obtaining the embedding for that
 # User's Query [CLI -> Embedding]
-@dataclass
+@dataclass(kw_only=True)
 class QueryRequestPayload(BasePayload):
     """CLI -> Embedding Service (Request Pathway)"""
     query_text: str
@@ -38,20 +38,20 @@ class QueryRequestPayload(BasePayload):
     top_k: int = 5        # How many images to return
 
 # Image Service [Image Service -> Embedding]
-@dataclass
+@dataclass(kw_only=True)
 class ImageAnnotatedPayload(BasePayload):
     vertices: list[dict]
     labels: list[str]
 
 # Vector Index (Targeting Vector DB) [Embedding -> Vector Index]
-@dataclass
+@dataclass(kw_only=True)
 class VectorIndexPayload(BasePayload):
     vector: list[float]
     db_name: str         # shared database with document service
     table_name: str      # specific table for vector index
     
 #  Document DB [image service -> document]
-@dataclass
+@dataclass(kw_only=True)
 class DocumentDBPayload(BasePayload):
     metadata: dict       # The vertices and labels
     db_name: str         # shared database with vector index
@@ -59,7 +59,7 @@ class DocumentDBPayload(BasePayload):
     storage_path: str
 
 # CLI Confirmation
-@dataclass
+@dataclass(kw_only=True)
 class CLIConfirmPayload(BasePayload):
     status: str
     message: str
