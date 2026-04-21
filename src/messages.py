@@ -38,6 +38,13 @@ async def run_service(
             except Exception as e:
                 print(f"[{service_name}] Error processing message: {e}")
 
+async def publish_message(channel_name: str, payload: BasePayload):
+    """
+    Publishes a payload object to a specific Redis channel.
+    """
+    json_data = payload.to_json() 
+    await redis_client.publish(channel_name, json_data)
+
 if __name__ == "__main__":
     asyncio.run(run_service())
 

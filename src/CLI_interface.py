@@ -1,7 +1,7 @@
 import asyncio
 import uuid
-from messages import redis_client
-from payload import ImageProcPayload, QueryRequestPayload
+from messages import redis_client, run_service
+from payload import ImageProcPayload, QueryRequestPayload, CLIConfirmPayload
 import ImageService, EmbeddingService, DocumentDBService, VectorIndexService
 
 async def cli_loop():
@@ -33,13 +33,22 @@ async def cli_loop():
             print(f"[CLI] Sending QueryRequestPayload to 'query_request_channel'...")
             await redis_client.publish("query_request_channel", msg.to_json())
 
+async def handle_confirmation(payload: CLIConfirmPayload):
+    print(f"[NOTIFY] Status: {payload.status} | {payload.message}")
+
 async def main():
     await asyncio.gather(
         ImageService.main(),  # The background listener
         EmbeddingService.main(),
         DocumentDBService.main(),
         VectorIndexService.main(),
-        cli_loop()           # The foreground interactive part
+        run_service(
+            service_name="CLI-Listener",
+            channel_name="cli_confirm_channel",
+            payload_class=CLIConfirmPayload,
+            callback=handle_confirmation
+        ),           
+        cli_loop() # The foreground interactive part
     )
 
 if __name__ == "__main__":
