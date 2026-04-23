@@ -21,11 +21,15 @@ class BasePayload:
         data = json.loads(json_str)
         return cls(**data)
 
-# Image Upload [CLI -> Image Service]
+# Image Upload [CLI -> Payload]
 @dataclass(kw_only=True)
-class ImageProcPayload(BasePayload):
+class ImageUploadPayload(BasePayload):
     path: str
     file_type: str
+
+@dataclass(kw_only=True)
+class ImageProcPayload(BasePayload):
+    encoded_image: str
 
 # Embedding Service has two AIs, one to do the embedding from the image to vector space and the other is to detect 
 # what the user is looking for and obtaining the embedding for that
@@ -63,19 +67,6 @@ class DocumentDBPayload(BasePayload):
 class CLIConfirmPayload(BasePayload):
     status: str
     message: str
-
-# @dataclass
-# class payload:
-#     id: int
-#     name: str
-#     is_active: bool
-
-# # Create instance
-# data = payload(id=1, name="Request_A", is_active=True)
-
-# # Convert to JSON string
-# json_payload = json.dumps(asdict(data))
-# print(json_payload)
 
 # 1. img_upload req (with image)
 # 2. image service will return the four points in an image 

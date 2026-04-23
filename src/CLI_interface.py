@@ -1,8 +1,9 @@
 import asyncio
 import uuid
 from messages import redis_client, run_service
-from payload import ImageProcPayload, QueryRequestPayload, CLIConfirmPayload
+from payload import QueryRequestPayload, CLIConfirmPayload, ImageUploadPayload
 import ImageService, EmbeddingService, DocumentDBService, VectorIndexService
+import upload
 
 async def cli_loop():
     print("Commands: 'up' (Upload Test), 'search' (Query Test), 'exit'")
@@ -15,14 +16,20 @@ async def cli_loop():
         if cmd == "exit": #does not quit the program fully until ^c
             break
 
-        elif cmd == "up": #fake data from AI to help test
-            msg = ImageProcPayload(
-                image_id=f"IMG-{uuid.uuid4().hex[:6]}",
-                path="./fake/path/cat.jpg",
-                file_type="jpg"
+        elif cmd == "up": 
+            path = input("File Path: ")
+            file_type = input("File Type: ")
+            # print(await upload.encode(path)) (testing if it works)
+
+            image_id=f"IMG-{uuid.uuid4().hex[:6]}"
+            
+            msg = ImageUploadPayload(
+                image_id=image_id,
+                path=path,
+                file_type=file_type
             )
-            print(f"[CLI] Sending ImageProcPayload to 'upload_channel'...")
-            await redis_client.publish("upload_channel", msg.to_json())
+            print(f"[CLI] Sending ImageUploadPayload to 'upload_request_channel'...")
+            await redis_client.publish("upload_request_channel", msg.to_json())
 
         elif cmd == "search": #fake data from AI to help test
             msg = QueryRequestPayload(
@@ -42,8 +49,9 @@ async def main():
         EmbeddingService.main(),
         DocumentDBService.main(),
         VectorIndexService.main(),
+        upload.main(),
         run_service(
-            service_name="CLI-Listener",
+            service_name="CLIListener",
             channel_name="cli_confirm_channel",
             payload_class=CLIConfirmPayload,
             callback=handle_confirmation
