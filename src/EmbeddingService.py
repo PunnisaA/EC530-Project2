@@ -1,6 +1,6 @@
 import asyncio
 from messages import run_service, publish_message
-from payload import ImageAnnotatedPayload, VectorIndexPayload
+from payload import ImageAnnotatedPayload, VectorIndexPayload, QueryRequestPayload
 
 async def create_embeddings(payload: ImageAnnotatedPayload):
     print(f"[EMBEDDING SERVICE] Received data for {payload.image_id}")
@@ -20,11 +20,22 @@ async def create_embeddings(payload: ImageAnnotatedPayload):
     )
     print(f"[EMBEDDING SERVICE] Vectors sent to 'vector_index_channel'")
 
+async def request_payload(payload: QueryRequestPayload):
+    print(f"[EMBEDDING SERVICE] Received data for {payload.image_id}")
+
 async def main():
-    await run_service(
+    await asyncio.gather(
+    run_service(
         service_name="EmbeddingService",
         channel_name="annotation_channel",
         payload_class=ImageAnnotatedPayload,
         callback=create_embeddings
+    ),
+    run_service(
+        service_name="EmbeddingService",
+        channel_name="query_request_channel",
+        payload_class=QueryRequestPayload,
+        callback=request_payload
+    )
     )
     

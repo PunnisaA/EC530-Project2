@@ -13,9 +13,9 @@ async def upload_request(payload: ImageUploadPayload):
     # print(f"[EMBEDDING SERVICE] Generating vectors for: {payload.image_id}")
 
     file_path = payload.path
-    print(file_path)
+    # print(file_path)
     encoded_images = await encode(file_path)
-    print(encoded_images)
+    # print(encoded_images)
 
     await publish_message(
         channel_name="upload_channel", 

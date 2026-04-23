@@ -1,6 +1,6 @@
 import asyncio
 import uuid
-from messages import redis_client, run_service
+from messages import redis_client, run_service, publish_message
 from payload import QueryRequestPayload, CLIConfirmPayload, ImageUploadPayload
 import ImageService, EmbeddingService, DocumentDBService, VectorIndexService
 import upload
@@ -31,14 +31,24 @@ async def cli_loop():
             print(f"[CLI] Sending ImageUploadPayload to 'upload_request_channel'...")
             await redis_client.publish("upload_request_channel", msg.to_json())
 
-        elif cmd == "search": #fake data from AI to help test
-            msg = QueryRequestPayload(
+        elif cmd == "search": 
+            user = input("User: ")
+            query = input("Query: ")
+            image_count = input("Number of Images: ")
+            
+
+            await publish_message(
+                channel_name="query_request_channel", 
+                payload=QueryRequestPayload(
                 image_id=f"SRCH-{uuid.uuid4().hex[:6]}",
-                query_text="Find photos of orange cats",
-                user_id="user_vader_99"
+                query_text=query,
+                user_id=user,
+                top_k=image_count
             )
+            )
+
             print(f"[CLI] Sending QueryRequestPayload to 'query_request_channel'...")
-            await redis_client.publish("query_request_channel", msg.to_json())
+            # await redis_client.publish("query_request_channel", msg.to_json())
 
 async def handle_confirmation(payload: CLIConfirmPayload):
     print(f"[NOTIFY] Status: {payload.status} | {payload.message}")
