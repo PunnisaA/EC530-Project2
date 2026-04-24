@@ -1,6 +1,6 @@
 import asyncio
-from messages import run_service, publish_message
-from payload import ImageAnnotatedPayload, VectorIndexPayload, QueryRequestPayload
+from messages import run_service, publish_message, run_service_req
+from payload import ImageAnnotatedPayload, VectorIndexPayload, QueryRequestPayload, VectorIndexRequestPayload
 
 async def create_embeddings(payload: ImageAnnotatedPayload):
     print(f"[EMBEDDING SERVICE] Received data for {payload.image_id}")
@@ -21,7 +21,20 @@ async def create_embeddings(payload: ImageAnnotatedPayload):
     print(f"[EMBEDDING SERVICE] Vectors sent to 'vector_index_channel'")
 
 async def request_payload(payload: QueryRequestPayload):
-    print(f"[EMBEDDING SERVICE] Received data for {payload.image_id}")
+    print(f"[EMBEDDING SERVICE] Received request for {payload.request_id}")
+    
+    mock_vector = [0.12, 0.45, -0.08, 0.99]
+
+    vector_data = VectorIndexRequestPayload(
+        request_id=payload.request_id,
+        vector = mock_vector,
+        top_k=payload.top_k
+    )
+    await publish_message(
+        channel_name="vector_index_request_channel",
+        payload=vector_data
+    )
+    print(f"[EMBEDDING SERVICE] Vectors sent to 'vector_index_request_channel'")
 
 async def main():
     await asyncio.gather(
@@ -31,7 +44,7 @@ async def main():
         payload_class=ImageAnnotatedPayload,
         callback=create_embeddings
     ),
-    run_service(
+    run_service_req(
         service_name="EmbeddingService",
         channel_name="query_request_channel",
         payload_class=QueryRequestPayload,

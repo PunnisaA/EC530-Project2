@@ -40,7 +40,7 @@ async def cli_loop():
             await publish_message(
                 channel_name="query_request_channel", 
                 payload=QueryRequestPayload(
-                image_id=f"SRCH-{uuid.uuid4().hex[:6]}",
+                request_id=f"REQ-{uuid.uuid4().hex[:6]}",
                 query_text=query,
                 user_id=user,
                 top_k=image_count

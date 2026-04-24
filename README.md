@@ -24,11 +24,6 @@ Publishers and Subscribers:
 CLI interface UPLOAD:
     connects to upload service, which connects to image service, and then takes the output of that into document db
 
-    TOPICS:
-    1. 
-    2. 
-    3.
-
 
 Message Structure Options:
 1. what is currently there (no DB)
@@ -56,9 +51,8 @@ Events:
 5. img_embedded
 6. img_proc
 
-
-#finish messaging system and define message
-
+payload 1:
+    creating an image upload request payload:
 
 
 
