@@ -1,7 +1,7 @@
 import asyncio
 import uuid
 from messages import redis_client, run_service, publish_message
-from payload import QueryRequestPayload, CLIConfirmPayload, ImageUploadPayload
+from payload import QueryRequestPayload, CLIConfirmPayload, ImageUploadPayload, ImagesFound
 import ImageService, EmbeddingService, DocumentDBService, VectorIndexService
 import upload
 
@@ -53,6 +53,9 @@ async def cli_loop():
 async def handle_confirmation(payload: CLIConfirmPayload):
     print(f"[NOTIFY] Status: {payload.status} | {payload.message}")
 
+async def return_request(payload: ImagesFound):
+    print(payload.encoded_images)
+
 async def main():
     await asyncio.gather(
         ImageService.main(),  # The background listener
@@ -65,7 +68,13 @@ async def main():
             channel_name="cli_confirm_channel",
             payload_class=CLIConfirmPayload,
             callback=handle_confirmation
-        ),           
+        ),
+        run_service(
+            service_name="CLIListener",
+            channel_name="request_complete",
+            payload_class=ImagesFound,
+            callback=return_request
+        ),     
         cli_loop() # The foreground interactive part
     )
 

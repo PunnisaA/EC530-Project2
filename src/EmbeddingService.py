@@ -27,6 +27,7 @@ async def request_payload(payload: QueryRequestPayload):
 
     vector_data = VectorIndexRequestPayload(
         request_id=payload.request_id,
+        user_id=payload.user_id,
         vector = mock_vector,
         top_k=payload.top_k
     )

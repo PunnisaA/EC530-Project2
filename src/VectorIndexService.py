@@ -1,6 +1,6 @@
 import asyncio
 from messages import run_service, publish_message, run_service_req
-from payload import VectorIndexPayload, CLIConfirmPayload, VectorIndexRequestPayload
+from payload import VectorIndexPayload, CLIConfirmPayload, VectorIndexRequestPayload, DocumentDBRequestPayload
 
 async def vector_space(payload: VectorIndexPayload):
     print(f"[Vector Index] Received data for {payload.image_id}")
@@ -13,16 +13,17 @@ async def vector_space(payload: VectorIndexPayload):
 
     await publish_message("cli_confirm_channel", confirmation)
 
-async def vector_request(payload: VectorIndexRequestPayload):
+async def vector_request(payload: DocumentDBRequestPayload):
     print(f"[Vector Index] Received data for {payload.request_id}")
 
     image = [{"id":2}]
-    db_info = VectorIndexPayload(
+    db_info = DocumentDBRequestPayload(
         request_id=payload.request_id,
+        user_id=payload.user_id,
         image_id=image
     )
     await publish_message(
-        channel_name="document_db_request_channel",
+        channel_name="documentdb_request_channel",
         payload=db_info
     )
     print(f"[Vector Index] Sent info for {payload.request_id}")

@@ -82,6 +82,7 @@ class VectorIndexRequestPayload(RequestBasePayload):
 class DocumentDBRequestPayload(RequestBasePayload):
     image_id: list[dict]    # list of image ids because they should be the same number
 
+# ImagesFound [documentdb -> CLI]
 @dataclass(kw_only=True)
 class ImagesFound(RequestBasePayload):
     encoded_images: list[str]   # list of encoded images
