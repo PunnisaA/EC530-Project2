@@ -30,3 +30,9 @@ async def main():
         payload_class=ImageProcPayload,
         callback=do_work
     )
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("ImageService shutting down...")

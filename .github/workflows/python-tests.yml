@@ -1,0 +1,15 @@
+steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          pip install pytest pytest-asyncio redis
+          # If you have a requirements.txt, use that instead:
+          # pip install -r requirements.txt
+      - name: Run Tests
+        env:
+          PYTHONPATH: src
+        run: pytest tests/

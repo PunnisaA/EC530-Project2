@@ -35,4 +35,10 @@ async def main():
             callback=document_request
         )
     )
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("DocumentDB shutting down...")
     
