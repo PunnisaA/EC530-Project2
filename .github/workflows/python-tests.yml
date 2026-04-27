@@ -36,9 +36,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest pytest-asyncio redis
 
-      - name: Create Dummy Image
-        # Since your UploadService needs a file to read, we create a fake one
-        run: test_image.jpg
+      # - name: Create Dummy Image
+      #   # Since your UploadService needs a file to read, we create a fake one
+      #   run: test_image.jpg
 
       - name: Run Pytest
         # Crucial: This tells the tests where the 'src' folder is
