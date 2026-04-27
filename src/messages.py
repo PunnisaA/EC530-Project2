@@ -27,6 +27,7 @@ async def run_service(
 
     async for message in pubsub.listen():
         if message['type'] == 'message':
+            print(f"\n>>> [{service_name}] Heard a message on Redis: {message['data']}")
             try:
                 # 1. Unpack JSON into the specific object type
                 raw_data = message['data'].decode('utf-8')

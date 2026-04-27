@@ -38,7 +38,7 @@ jobs:
 
       - name: Create Dummy Image
         # Since your UploadService needs a file to read, we create a fake one
-        run: touch test_image.jpg
+        run: test_image.jpg
 
       - name: Run Pytest
         # Crucial: This tells the tests where the 'src' folder is
