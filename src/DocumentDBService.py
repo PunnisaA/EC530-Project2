@@ -3,14 +3,33 @@ from messages import run_service, run_service_req, publish_message
 from payload import DocumentDBPayload, DocumentDBRequestPayload, ImagesFound
 import pymongo
 
-async def storingImages():
-    client = pymongo.MongoClient("mongodb://localhost:27017/")
-    db = client["Image_Database"]
 
-    return 0
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+db = client["Image_Database"]
+collection = db["images"]
 
 async def document(payload: DocumentDBPayload):
     print(f"[Document Service] Received data for {payload.image_id}")
+
+    doc = {
+        "image_id": payload.image_id,
+        "db_name": payload.db_name,
+        "table_name": payload.table_name,
+        "storage_path": payload.storage_path,
+        "objects": [
+            {
+                "label": obj["label"],
+                "vertices": obj["vertices"]
+            }
+            for obj in payload.objects
+        ]
+    }
+
+    database = client[payload.db_name]
+    collection = database[payload.table_name]
+
+    collection.insert_one(doc)
+    print(f"[Document Service] Stored image {payload.image_id}")
 
 async def document_request(payload: DocumentDBRequestPayload):
     print(f"[Document Service] Received data for {payload.request_id}")

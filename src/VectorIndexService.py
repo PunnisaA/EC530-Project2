@@ -1,9 +1,21 @@
 import asyncio
 from messages import run_service, publish_message, run_service_req
 from payload import VectorIndexPayload, CLIConfirmPayload, VectorIndexRequestPayload, DocumentDBRequestPayload
+import pymongo
+
+client = pymongo.MongoClient("mongodb://localhost:27017/")
+vector_db = client["Vector_DB"]
+vector_collection = vector_db["vector_requests"]
 
 async def vector_space(payload: VectorIndexPayload):
     print(f"[Vector Index] Received data for {payload.image_id}")
+
+    vector_collection.insert_one({
+    "image_id": payload.image_id,
+    "vector": payload.vector,
+    })
+
+    print(f"[Vector Index Service] Stored image {payload.image_id}")
 
     confirmation = CLIConfirmPayload(
         image_id=payload.image_id,

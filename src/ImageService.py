@@ -3,8 +3,6 @@ from messages import run_service, publish_message
 from payload import ImageProcPayload, ImageAnnotatedPayload, DocumentDBPayload
 from typing import List, Tuple
 
-async def to_tuple(v):
-    return (v["x"], v["y"])
 
 async def do_work(payload: ImageProcPayload):
     print(f"Working on {payload.image_id}")
