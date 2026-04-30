@@ -28,6 +28,7 @@ async def upload_request(payload: ImageUploadPayload):
             channel_name="upload_channel", 
             payload=ImageProcPayload(
                 image_id=payload.image_id,
+                path=file_path,
                 encoded_image=encoded_images
             )
         )

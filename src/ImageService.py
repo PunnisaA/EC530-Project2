@@ -1,6 +1,10 @@
 import asyncio
 from messages import run_service, publish_message
-from payload import ImageProcPayload, ImageAnnotatedPayload
+from payload import ImageProcPayload, ImageAnnotatedPayload, DocumentDBPayload
+from typing import List, Tuple
+
+async def to_tuple(v):
+    return (v["x"], v["y"])
 
 async def do_work(payload: ImageProcPayload):
     print(f"Working on {payload.image_id}")
@@ -9,12 +13,23 @@ async def do_work(payload: ImageProcPayload):
     print(f">>> Timestamp: {payload.timestamp}")
 
     detected_labels = ["cat", "sofa"]
-    detected_vertices = [{"x": 10, "y": 20}, {"x": 50, "y": 100}]
+    detected_vertices = [
+    [{"x": 10, "y": 20}, {"x": 15, "y": 25}],   # vertices for "cat"
+    [{"x": 50, "y": 100}, {"x": 60, "y": 110}]  # vertices for "sofa"   
+    ]
+
+    annotated_objects = [
+    {
+        "label": label,
+        "vertices": [(v["x"], v["y"]) for v in verts]
+    }
+    for label, verts in zip(detected_labels, detected_vertices)
+    ]
 
     annotated_data = ImageAnnotatedPayload(
         image_id=payload.image_id,
-        labels=detected_labels,
-        vertices=detected_vertices
+        objects=annotated_objects
+
     )
 
     await publish_message(
@@ -22,6 +37,18 @@ async def do_work(payload: ImageProcPayload):
         payload=annotated_data
     )
     print(f">>> [IMAGE SERVICE] Sent annotations to 'annotation_channel'")
+
+    await publish_message(
+        channel_name="document_channel",
+        payload=DocumentDBPayload(
+            image_id=payload.image_id,
+            db_name="Image_Database",
+            table_name="images",
+            storage_path=payload.path,
+            objects=annotated_objects
+        )
+    )
+    print(f">>> [IMAGE SERVICE] Sent annotations to 'document_channel'")
 
 async def main():
     await run_service(

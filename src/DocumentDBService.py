@@ -1,6 +1,13 @@
 import asyncio
 from messages import run_service, run_service_req, publish_message
 from payload import DocumentDBPayload, DocumentDBRequestPayload, ImagesFound
+import pymongo
+
+async def storingImages():
+    client = pymongo.MongoClient("mongodb://localhost:27017/")
+    db = client["Image_Database"]
+
+    return 0
 
 async def document(payload: DocumentDBPayload):
     print(f"[Document Service] Received data for {payload.image_id}")

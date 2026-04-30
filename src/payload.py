@@ -2,6 +2,12 @@ from dataclasses import dataclass, asdict, field
 import uuid
 from datetime import datetime, timezone
 import json
+from typing import List, Tuple, Any
+
+@dataclass
+class ObjectAnnotation:
+    vertices: List[Tuple[float, float]]
+    label: str
 
 # every other class will have the base payload and have unique event IDs
 @dataclass(kw_only=True)
@@ -47,6 +53,7 @@ class ImageUploadPayload(UploadBasePayload):
 
 @dataclass(kw_only=True)
 class ImageProcPayload(UploadBasePayload):
+    path: str
     encoded_image: str
 
 # Embedding Service has two AIs, one to do the embedding from the image to vector space and the other is to detect 
@@ -61,8 +68,7 @@ class QueryRequestPayload(RequestBasePayload):
 # Image Service [Image Service -> Embedding]
 @dataclass(kw_only=True)
 class ImageAnnotatedPayload(UploadBasePayload):
-    vertices: list[dict]
-    labels: list[str]
+    objects: ObjectAnnotation
 
 # Vector Index (Targeting Vector DB) [Embedding -> Vector Index]
 @dataclass(kw_only=True)
@@ -90,10 +96,10 @@ class ImagesFound(RequestBasePayload):
 #  Document DB [image service -> document]
 @dataclass(kw_only=True)
 class DocumentDBPayload(UploadBasePayload):
-    metadata: dict       # The vertices and labels
     db_name: str         # shared database with vector index
     table_name: str      # specific table for document db
     storage_path: str
+    objects: ObjectAnnotation
 
 # CLI Confirmation
 @dataclass(kw_only=True)
