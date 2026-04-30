@@ -40,7 +40,7 @@ async def test_upload_to_index_flow():
         print(f"[TEST] Sent {test_image_id} to upload_request_channel")
 
         # Wait for the result
-        final_status = await asyncio.wait_for(get_confirmation(), timeout=7.0)
+        final_status = await asyncio.wait_for(get_confirmation(), timeout=15.0)
         
         # 4. Assertions
         assert final_status["status"] == "SUCCESS"

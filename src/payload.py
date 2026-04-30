@@ -107,11 +107,3 @@ class CLIConfirmPayload(UploadBasePayload):
     status: str
     message: str
 
-# 1. img_upload req (with image)
-# 2. image service will return the four points in an image 
-# 3. payload for sending the four vertices to embedding 
-# 4. payload for sending the vector index of the image to the vector index database?
-# 5. payload for sending the image to the document database
-# 4 and 5 needs to have the same ID corresponding between the image and vector embedding of that image?
-# 6. payload to send information back to the CLI interface 
-
