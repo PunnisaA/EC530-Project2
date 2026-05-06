@@ -36,3 +36,5 @@ cons:
 - multiple people being able to access is security issue
 
 chose 2 for the purposes of not having to move all the data around
+
+Video Link in GDrive: https://drive.google.com/file/d/1oZBiFdSN1uU71vrZBQef5nTs2sC-Pyxp/view?usp=sharing
